@@ -83,123 +83,88 @@ class MarketDataFetcher:
             "affordable": 0.7
         }
 
-        # Base data for German cities (realistic 2024 estimates)
+        # Base data dynamically generated from config GERMAN_CITIES
         self._base_city_data = self._initialize_city_base_data()
 
     def _initialize_city_base_data(self) -> Dict[str, Dict[str, Any]]:
-        """Initialize base market data for cities."""
-        return {
-            "muenchen": {
-                "avg_price_sqm": 9200,
-                "price_range": (6500, 15000),
-                "avg_rent_sqm": 21.0,
-                "price_yoy_change": -5.2,
-                "rent_yoy_change": 4.5,
-                "inventory_months": 4.5,
-                "days_on_market": 45,
-                "unemployment_rate": 3.2,
-                "median_income": 58000,
-            },
-            "berlin": {
-                "avg_price_sqm": 5100,
-                "price_range": (3200, 9500),
-                "avg_rent_sqm": 13.20,
-                "price_yoy_change": -8.5,
-                "rent_yoy_change": 6.2,
-                "inventory_months": 5.8,
-                "days_on_market": 52,
-                "unemployment_rate": 8.9,
-                "median_income": 42000,
-            },
-            "hamburg": {
-                "avg_price_sqm": 6100,
-                "price_range": (4000, 11000),
-                "avg_rent_sqm": 14.50,
-                "price_yoy_change": -6.8,
-                "rent_yoy_change": 5.1,
-                "inventory_months": 5.2,
-                "days_on_market": 48,
-                "unemployment_rate": 6.5,
-                "median_income": 48000,
-            },
-            "frankfurt": {
-                "avg_price_sqm": 6600,
-                "price_range": (4500, 12000),
-                "avg_rent_sqm": 15.80,
-                "price_yoy_change": -7.2,
-                "rent_yoy_change": 4.8,
-                "inventory_months": 4.8,
-                "days_on_market": 42,
-                "unemployment_rate": 5.8,
-                "median_income": 55000,
-            },
-            "koeln": {
-                "avg_price_sqm": 4400,
-                "price_range": (2800, 7500),
-                "avg_rent_sqm": 12.80,
-                "price_yoy_change": -5.5,
-                "rent_yoy_change": 4.2,
-                "inventory_months": 5.5,
-                "days_on_market": 55,
-                "unemployment_rate": 7.2,
-                "median_income": 44000,
-            },
-            "duesseldorf": {
-                "avg_price_sqm": 4900,
-                "price_range": (3200, 8500),
-                "avg_rent_sqm": 13.20,
-                "price_yoy_change": -4.8,
-                "rent_yoy_change": 4.5,
-                "inventory_months": 5.0,
-                "days_on_market": 50,
-                "unemployment_rate": 6.8,
-                "median_income": 48000,
-            },
-            "stuttgart": {
-                "avg_price_sqm": 5600,
-                "price_range": (3800, 9500),
-                "avg_rent_sqm": 14.50,
-                "price_yoy_change": -5.0,
-                "rent_yoy_change": 4.0,
-                "inventory_months": 4.2,
-                "days_on_market": 40,
-                "unemployment_rate": 4.5,
-                "median_income": 52000,
-            },
-            "leipzig": {
-                "avg_price_sqm": 3100,
-                "price_range": (2000, 5500),
-                "avg_rent_sqm": 9.20,
-                "price_yoy_change": -3.2,
-                "rent_yoy_change": 5.8,
-                "inventory_months": 6.5,
-                "days_on_market": 65,
-                "unemployment_rate": 6.2,
-                "median_income": 36000,
-            },
-            "dortmund": {
-                "avg_price_sqm": 2700,
-                "price_range": (1800, 4500),
-                "avg_rent_sqm": 8.80,
-                "price_yoy_change": -2.5,
-                "rent_yoy_change": 4.5,
-                "inventory_months": 7.0,
-                "days_on_market": 70,
-                "unemployment_rate": 9.5,
-                "median_income": 35000,
-            },
-            "nuernberg": {
-                "avg_price_sqm": 4100,
-                "price_range": (2800, 6500),
-                "avg_rent_sqm": 12.00,
-                "price_yoy_change": -4.0,
-                "rent_yoy_change": 4.2,
-                "inventory_months": 5.0,
-                "days_on_market": 55,
-                "unemployment_rate": 5.2,
-                "median_income": 44000,
-            },
-        }
+        """
+        Initialize base market data for all cities from config.
+
+        Dynamically generates market data based on city characteristics
+        from the GERMAN_CITIES configuration.
+        """
+        base_data = {}
+
+        for city_key, city_info in GERMAN_CITIES.items():
+            # Generate realistic market data based on city characteristics
+            avg_price = city_info.avg_price_sqm
+            avg_rent = city_info.avg_rent_sqm
+            population = city_info.population
+
+            # Price range based on average (typically 30% below to 60% above average)
+            price_range_low = avg_price * 0.65
+            price_range_high = avg_price * 1.65
+
+            # Price change correlates with price level (more expensive = bigger correction)
+            if avg_price > 7000:
+                price_yoy_change = random.uniform(-8.0, -5.0)
+            elif avg_price > 5000:
+                price_yoy_change = random.uniform(-6.0, -3.5)
+            elif avg_price > 3500:
+                price_yoy_change = random.uniform(-4.5, -2.0)
+            else:
+                price_yoy_change = random.uniform(-3.0, -0.5)
+
+            # Rent growth (typically positive, higher in tight markets)
+            if avg_rent > 14:
+                rent_yoy_change = random.uniform(4.0, 6.0)
+            elif avg_rent > 11:
+                rent_yoy_change = random.uniform(3.5, 5.0)
+            else:
+                rent_yoy_change = random.uniform(3.0, 4.5)
+
+            # Inventory months (larger cities = tighter markets)
+            if population > 1000000:
+                inventory_months = random.uniform(4.0, 5.5)
+            elif population > 500000:
+                inventory_months = random.uniform(4.5, 6.0)
+            elif population > 200000:
+                inventory_months = random.uniform(5.0, 7.0)
+            else:
+                inventory_months = random.uniform(5.5, 8.0)
+
+            # Days on market (inverse of market activity)
+            days_on_market = inventory_months * 10 + random.uniform(-5, 10)
+
+            # Unemployment rate by region (approximation)
+            state = city_info.state
+            if state in ["Bayern", "Baden-Württemberg"]:
+                unemployment_rate = random.uniform(3.0, 5.0)
+            elif state in ["Hamburg", "Hessen"]:
+                unemployment_rate = random.uniform(4.5, 7.0)
+            elif state in ["Berlin", "Bremen"]:
+                unemployment_rate = random.uniform(7.5, 10.0)
+            elif state in ["Sachsen", "Thüringen", "Sachsen-Anhalt", "Brandenburg", "Mecklenburg-Vorpommern"]:
+                unemployment_rate = random.uniform(5.5, 8.0)
+            else:
+                unemployment_rate = random.uniform(5.0, 8.0)
+
+            # Median income correlates with price level
+            median_income = max(32000, min(65000, avg_price * 6.5))
+
+            base_data[city_key] = {
+                "avg_price_sqm": avg_price,
+                "price_range": (int(price_range_low), int(price_range_high)),
+                "avg_rent_sqm": avg_rent,
+                "price_yoy_change": round(price_yoy_change, 1),
+                "rent_yoy_change": round(rent_yoy_change, 1),
+                "inventory_months": round(inventory_months, 1),
+                "days_on_market": int(days_on_market),
+                "unemployment_rate": round(unemployment_rate, 1),
+                "median_income": int(median_income),
+            }
+
+        return base_data
 
     def get_city_market_data(
         self,

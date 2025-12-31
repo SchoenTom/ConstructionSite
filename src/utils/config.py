@@ -171,88 +171,114 @@ class CityData:
     plz_ranges: List[Tuple[str, str]] = field(default_factory=list)
 
 
-# Major German cities with market data
+# Comprehensive German cities database with market data (2024 estimates)
 GERMAN_CITIES: Dict[str, CityData] = {
-    "muenchen": CityData(
-        name="München",
-        state="Bayern",
-        population=1488000,
-        avg_price_sqm=9500.0,
-        avg_rent_sqm=21.50,
-        plz_ranges=[("80331", "81929")]
-    ),
-    "berlin": CityData(
-        name="Berlin",
-        state="Berlin",
-        population=3645000,
-        avg_price_sqm=5200.0,
-        avg_rent_sqm=13.50,
-        plz_ranges=[("10115", "14199")]
-    ),
-    "hamburg": CityData(
-        name="Hamburg",
-        state="Hamburg",
-        population=1841000,
-        avg_price_sqm=6200.0,
-        avg_rent_sqm=14.80,
-        plz_ranges=[("20095", "22769")]
-    ),
-    "frankfurt": CityData(
-        name="Frankfurt am Main",
-        state="Hessen",
-        population=753000,
-        avg_price_sqm=6800.0,
-        avg_rent_sqm=16.20,
-        plz_ranges=[("60306", "60599")]
-    ),
-    "koeln": CityData(
-        name="Köln",
-        state="Nordrhein-Westfalen",
-        population=1086000,
-        avg_price_sqm=4500.0,
-        avg_rent_sqm=13.00,
-        plz_ranges=[("50667", "51149")]
-    ),
-    "duesseldorf": CityData(
-        name="Düsseldorf",
-        state="Nordrhein-Westfalen",
-        population=620000,
-        avg_price_sqm=5000.0,
-        avg_rent_sqm=13.50,
-        plz_ranges=[("40210", "40629")]
-    ),
-    "stuttgart": CityData(
-        name="Stuttgart",
-        state="Baden-Württemberg",
-        population=635000,
-        avg_price_sqm=5800.0,
-        avg_rent_sqm=15.00,
-        plz_ranges=[("70173", "70619")]
-    ),
-    "leipzig": CityData(
-        name="Leipzig",
-        state="Sachsen",
-        population=597000,
-        avg_price_sqm=3200.0,
-        avg_rent_sqm=9.50,
-        plz_ranges=[("04103", "04357")]
-    ),
-    "dortmund": CityData(
-        name="Dortmund",
-        state="Nordrhein-Westfalen",
-        population=588000,
-        avg_price_sqm=2800.0,
-        avg_rent_sqm=9.00,
-        plz_ranges=[("44135", "44388")]
-    ),
-    "nuernberg": CityData(
-        name="Nürnberg",
-        state="Bayern",
-        population=518000,
-        avg_price_sqm=4200.0,
-        avg_rent_sqm=12.50,
-        plz_ranges=[("90402", "90491")]
-    ),
+    # Top 10 largest cities
+    "muenchen": CityData(name="München", state="Bayern", population=1488000, avg_price_sqm=9200.0, avg_rent_sqm=21.0, plz_ranges=[("80331", "81929")]),
+    "berlin": CityData(name="Berlin", state="Berlin", population=3645000, avg_price_sqm=5100.0, avg_rent_sqm=13.2, plz_ranges=[("10115", "14199")]),
+    "hamburg": CityData(name="Hamburg", state="Hamburg", population=1841000, avg_price_sqm=6100.0, avg_rent_sqm=14.5, plz_ranges=[("20095", "22769")]),
+    "frankfurt": CityData(name="Frankfurt am Main", state="Hessen", population=753000, avg_price_sqm=6600.0, avg_rent_sqm=15.8, plz_ranges=[("60306", "60599")]),
+    "koeln": CityData(name="Köln", state="Nordrhein-Westfalen", population=1086000, avg_price_sqm=4400.0, avg_rent_sqm=12.8, plz_ranges=[("50667", "51149")]),
+    "duesseldorf": CityData(name="Düsseldorf", state="Nordrhein-Westfalen", population=620000, avg_price_sqm=4900.0, avg_rent_sqm=13.2, plz_ranges=[("40210", "40629")]),
+    "stuttgart": CityData(name="Stuttgart", state="Baden-Württemberg", population=635000, avg_price_sqm=5600.0, avg_rent_sqm=14.5, plz_ranges=[("70173", "70619")]),
+    "leipzig": CityData(name="Leipzig", state="Sachsen", population=597000, avg_price_sqm=3100.0, avg_rent_sqm=9.2, plz_ranges=[("04103", "04357")]),
+    "dortmund": CityData(name="Dortmund", state="Nordrhein-Westfalen", population=588000, avg_price_sqm=2700.0, avg_rent_sqm=8.8, plz_ranges=[("44135", "44388")]),
+    "nuernberg": CityData(name="Nürnberg", state="Bayern", population=518000, avg_price_sqm=4100.0, avg_rent_sqm=12.0, plz_ranges=[("90402", "90491")]),
+
+    # Additional major cities
+    "essen": CityData(name="Essen", state="Nordrhein-Westfalen", population=583000, avg_price_sqm=2600.0, avg_rent_sqm=8.5, plz_ranges=[("45127", "45359")]),
+    "bremen": CityData(name="Bremen", state="Bremen", population=567000, avg_price_sqm=3200.0, avg_rent_sqm=10.0, plz_ranges=[("28195", "28779")]),
+    "dresden": CityData(name="Dresden", state="Sachsen", population=556000, avg_price_sqm=3400.0, avg_rent_sqm=9.8, plz_ranges=[("01067", "01328")]),
+    "hannover": CityData(name="Hannover", state="Niedersachsen", population=536000, avg_price_sqm=3500.0, avg_rent_sqm=10.5, plz_ranges=[("30159", "30659")]),
+    "duisburg": CityData(name="Duisburg", state="Nordrhein-Westfalen", population=498000, avg_price_sqm=2200.0, avg_rent_sqm=7.8, plz_ranges=[("47051", "47279")]),
+    "bochum": CityData(name="Bochum", state="Nordrhein-Westfalen", population=365000, avg_price_sqm=2500.0, avg_rent_sqm=8.2, plz_ranges=[("44787", "44894")]),
+    "wuppertal": CityData(name="Wuppertal", state="Nordrhein-Westfalen", population=355000, avg_price_sqm=2300.0, avg_rent_sqm=7.9, plz_ranges=[("42103", "42399")]),
+    "bielefeld": CityData(name="Bielefeld", state="Nordrhein-Westfalen", population=334000, avg_price_sqm=2800.0, avg_rent_sqm=9.0, plz_ranges=[("33602", "33739")]),
+    "bonn": CityData(name="Bonn", state="Nordrhein-Westfalen", population=331000, avg_price_sqm=4200.0, avg_rent_sqm=12.5, plz_ranges=[("53111", "53229")]),
+    "muenster": CityData(name="Münster", state="Nordrhein-Westfalen", population=317000, avg_price_sqm=4500.0, avg_rent_sqm=13.0, plz_ranges=[("48143", "48167")]),
+
+    # Baden-Württemberg cities
+    "karlsruhe": CityData(name="Karlsruhe", state="Baden-Württemberg", population=308000, avg_price_sqm=4000.0, avg_rent_sqm=12.0, plz_ranges=[("76131", "76229")]),
+    "mannheim": CityData(name="Mannheim", state="Baden-Württemberg", population=310000, avg_price_sqm=3800.0, avg_rent_sqm=11.5, plz_ranges=[("68159", "68309")]),
+    "freiburg": CityData(name="Freiburg im Breisgau", state="Baden-Württemberg", population=230000, avg_price_sqm=5200.0, avg_rent_sqm=14.0, plz_ranges=[("79098", "79117")]),
+    "heidelberg": CityData(name="Heidelberg", state="Baden-Württemberg", population=160000, avg_price_sqm=5500.0, avg_rent_sqm=14.5, plz_ranges=[("69115", "69126")]),
+    "ulm": CityData(name="Ulm", state="Baden-Württemberg", population=128000, avg_price_sqm=4300.0, avg_rent_sqm=12.5, plz_ranges=[("89073", "89081")]),
+    "heilbronn": CityData(name="Heilbronn", state="Baden-Württemberg", population=126000, avg_price_sqm=3600.0, avg_rent_sqm=11.0, plz_ranges=[("74072", "74081")]),
+    "pforzheim": CityData(name="Pforzheim", state="Baden-Württemberg", population=125000, avg_price_sqm=3200.0, avg_rent_sqm=10.5, plz_ranges=[("75172", "75181")]),
+    "reutlingen": CityData(name="Reutlingen", state="Baden-Württemberg", population=116000, avg_price_sqm=3800.0, avg_rent_sqm=11.5, plz_ranges=[("72760", "72770")]),
+    "tuebingen": CityData(name="Tübingen", state="Baden-Württemberg", population=91000, avg_price_sqm=5000.0, avg_rent_sqm=14.0, plz_ranges=[("72070", "72076")]),
+    "konstanz": CityData(name="Konstanz", state="Baden-Württemberg", population=85000, avg_price_sqm=5800.0, avg_rent_sqm=15.5, plz_ranges=[("78462", "78467")]),
+    "ludwigsburg": CityData(name="Ludwigsburg", state="Baden-Württemberg", population=93000, avg_price_sqm=4500.0, avg_rent_sqm=13.0, plz_ranges=[("71634", "71642")]),
+    "esslingen": CityData(name="Esslingen am Neckar", state="Baden-Württemberg", population=94000, avg_price_sqm=4200.0, avg_rent_sqm=12.5, plz_ranges=[("73728", "73734")]),
+    "offenburg": CityData(name="Offenburg", state="Baden-Württemberg", population=62000, avg_price_sqm=3500.0, avg_rent_sqm=11.0, plz_ranges=[("77652", "77656")]),
+    "friedrichshafen": CityData(name="Friedrichshafen", state="Baden-Württemberg", population=62000, avg_price_sqm=4800.0, avg_rent_sqm=13.5, plz_ranges=[("88045", "88048")]),
+    "ravensburg": CityData(name="Ravensburg", state="Baden-Württemberg", population=51000, avg_price_sqm=4500.0, avg_rent_sqm=13.0, plz_ranges=[("88212", "88214")]),
+    "villingen_schwenningen": CityData(name="Villingen-Schwenningen", state="Baden-Württemberg", population=86000, avg_price_sqm=3200.0, avg_rent_sqm=10.5, plz_ranges=[("78048", "78056")]),
+
+    # Bayern cities
+    "augsburg": CityData(name="Augsburg", state="Bayern", population=296000, avg_price_sqm=4200.0, avg_rent_sqm=12.0, plz_ranges=[("86150", "86199")]),
+    "regensburg": CityData(name="Regensburg", state="Bayern", population=153000, avg_price_sqm=4800.0, avg_rent_sqm=13.5, plz_ranges=[("93047", "93059")]),
+    "wuerzburg": CityData(name="Würzburg", state="Bayern", population=127000, avg_price_sqm=4500.0, avg_rent_sqm=12.5, plz_ranges=[("97070", "97084")]),
+    "ingolstadt": CityData(name="Ingolstadt", state="Bayern", population=138000, avg_price_sqm=4600.0, avg_rent_sqm=13.0, plz_ranges=[("85049", "85057")]),
+    "erlangen": CityData(name="Erlangen", state="Bayern", population=113000, avg_price_sqm=4700.0, avg_rent_sqm=13.5, plz_ranges=[("91052", "91058")]),
+    "fuerth": CityData(name="Fürth", state="Bayern", population=130000, avg_price_sqm=3800.0, avg_rent_sqm=11.5, plz_ranges=[("90762", "90768")]),
+    "passau": CityData(name="Passau", state="Bayern", population=53000, avg_price_sqm=3500.0, avg_rent_sqm=10.5, plz_ranges=[("94032", "94036")]),
+    "landshut": CityData(name="Landshut", state="Bayern", population=74000, avg_price_sqm=4300.0, avg_rent_sqm=12.5, plz_ranges=[("84028", "84036")]),
+    "rosenheim": CityData(name="Rosenheim", state="Bayern", population=65000, avg_price_sqm=5500.0, avg_rent_sqm=14.5, plz_ranges=[("83022", "83026")]),
+    "bamberg": CityData(name="Bamberg", state="Bayern", population=78000, avg_price_sqm=4000.0, avg_rent_sqm=11.5, plz_ranges=[("96047", "96052")]),
+    "bayreuth": CityData(name="Bayreuth", state="Bayern", population=75000, avg_price_sqm=3200.0, avg_rent_sqm=9.8, plz_ranges=[("95444", "95448")]),
+
+    # Hessen cities
+    "wiesbaden": CityData(name="Wiesbaden", state="Hessen", population=278000, avg_price_sqm=5000.0, avg_rent_sqm=13.5, plz_ranges=[("65183", "65207")]),
+    "kassel": CityData(name="Kassel", state="Hessen", population=202000, avg_price_sqm=2800.0, avg_rent_sqm=9.0, plz_ranges=[("34117", "34134")]),
+    "darmstadt": CityData(name="Darmstadt", state="Hessen", population=160000, avg_price_sqm=4500.0, avg_rent_sqm=13.0, plz_ranges=[("64283", "64297")]),
+    "offenbach": CityData(name="Offenbach am Main", state="Hessen", population=130000, avg_price_sqm=4000.0, avg_rent_sqm=12.0, plz_ranges=[("63065", "63075")]),
+    "marburg": CityData(name="Marburg", state="Hessen", population=77000, avg_price_sqm=3800.0, avg_rent_sqm=11.5, plz_ranges=[("35037", "35043")]),
+    "giessen": CityData(name="Gießen", state="Hessen", population=90000, avg_price_sqm=3200.0, avg_rent_sqm=10.0, plz_ranges=[("35390", "35398")]),
+
+    # Niedersachsen cities
+    "braunschweig": CityData(name="Braunschweig", state="Niedersachsen", population=249000, avg_price_sqm=3200.0, avg_rent_sqm=10.0, plz_ranges=[("38100", "38126")]),
+    "oldenburg": CityData(name="Oldenburg", state="Niedersachsen", population=170000, avg_price_sqm=3100.0, avg_rent_sqm=9.8, plz_ranges=[("26121", "26135")]),
+    "osnabrueck": CityData(name="Osnabrück", state="Niedersachsen", population=165000, avg_price_sqm=3000.0, avg_rent_sqm=9.5, plz_ranges=[("49074", "49090")]),
+    "wolfsburg": CityData(name="Wolfsburg", state="Niedersachsen", population=125000, avg_price_sqm=2800.0, avg_rent_sqm=9.0, plz_ranges=[("38440", "38448")]),
+    "goettingen": CityData(name="Göttingen", state="Niedersachsen", population=120000, avg_price_sqm=3500.0, avg_rent_sqm=11.0, plz_ranges=[("37073", "37085")]),
+    "lueneburg": CityData(name="Lüneburg", state="Niedersachsen", population=78000, avg_price_sqm=3800.0, avg_rent_sqm=11.5, plz_ranges=[("21335", "21339")]),
+
+    # Rheinland-Pfalz cities
+    "mainz": CityData(name="Mainz", state="Rheinland-Pfalz", population=218000, avg_price_sqm=4500.0, avg_rent_sqm=13.0, plz_ranges=[("55116", "55131")]),
+    "koblenz": CityData(name="Koblenz", state="Rheinland-Pfalz", population=114000, avg_price_sqm=3200.0, avg_rent_sqm=10.0, plz_ranges=[("56068", "56077")]),
+    "trier": CityData(name="Trier", state="Rheinland-Pfalz", population=111000, avg_price_sqm=3500.0, avg_rent_sqm=10.5, plz_ranges=[("54290", "54296")]),
+    "kaiserslautern": CityData(name="Kaiserslautern", state="Rheinland-Pfalz", population=100000, avg_price_sqm=2600.0, avg_rent_sqm=8.5, plz_ranges=[("67655", "67663")]),
+    "ludwigshafen": CityData(name="Ludwigshafen am Rhein", state="Rheinland-Pfalz", population=172000, avg_price_sqm=3000.0, avg_rent_sqm=9.5, plz_ranges=[("67059", "67071")]),
+
+    # Sachsen cities
+    "chemnitz": CityData(name="Chemnitz", state="Sachsen", population=247000, avg_price_sqm=1800.0, avg_rent_sqm=6.5, plz_ranges=[("09111", "09131")]),
+    "zwickau": CityData(name="Zwickau", state="Sachsen", population=88000, avg_price_sqm=1500.0, avg_rent_sqm=5.8, plz_ranges=[("08056", "08066")]),
+
+    # Thüringen cities
+    "erfurt": CityData(name="Erfurt", state="Thüringen", population=214000, avg_price_sqm=2800.0, avg_rent_sqm=8.5, plz_ranges=[("99084", "99099")]),
+    "jena": CityData(name="Jena", state="Thüringen", population=111000, avg_price_sqm=3200.0, avg_rent_sqm=9.5, plz_ranges=[("07743", "07751")]),
+    "weimar": CityData(name="Weimar", state="Thüringen", population=65000, avg_price_sqm=2800.0, avg_rent_sqm=8.5, plz_ranges=[("99423", "99428")]),
+
+    # Sachsen-Anhalt cities
+    "magdeburg": CityData(name="Magdeburg", state="Sachsen-Anhalt", population=238000, avg_price_sqm=2200.0, avg_rent_sqm=7.5, plz_ranges=[("39104", "39130")]),
+    "halle": CityData(name="Halle (Saale)", state="Sachsen-Anhalt", population=240000, avg_price_sqm=2000.0, avg_rent_sqm=7.0, plz_ranges=[("06108", "06132")]),
+
+    # Brandenburg cities
+    "potsdam": CityData(name="Potsdam", state="Brandenburg", population=183000, avg_price_sqm=4500.0, avg_rent_sqm=12.5, plz_ranges=[("14467", "14482")]),
+    "cottbus": CityData(name="Cottbus", state="Brandenburg", population=100000, avg_price_sqm=1800.0, avg_rent_sqm=6.5, plz_ranges=[("03042", "03055")]),
+
+    # Mecklenburg-Vorpommern cities
+    "rostock": CityData(name="Rostock", state="Mecklenburg-Vorpommern", population=209000, avg_price_sqm=3200.0, avg_rent_sqm=9.5, plz_ranges=[("18055", "18147")]),
+    "schwerin": CityData(name="Schwerin", state="Mecklenburg-Vorpommern", population=96000, avg_price_sqm=2500.0, avg_rent_sqm=8.0, plz_ranges=[("19053", "19063")]),
+
+    # Schleswig-Holstein cities
+    "kiel": CityData(name="Kiel", state="Schleswig-Holstein", population=247000, avg_price_sqm=3500.0, avg_rent_sqm=10.5, plz_ranges=[("24103", "24159")]),
+    "luebeck": CityData(name="Lübeck", state="Schleswig-Holstein", population=217000, avg_price_sqm=3800.0, avg_rent_sqm=11.0, plz_ranges=[("23552", "23570")]),
+    "flensburg": CityData(name="Flensburg", state="Schleswig-Holstein", population=91000, avg_price_sqm=2800.0, avg_rent_sqm=9.0, plz_ranges=[("24937", "24944")]),
+
+    # Saarland
+    "saarbruecken": CityData(name="Saarbrücken", state="Saarland", population=180000, avg_price_sqm=2500.0, avg_rent_sqm=8.5, plz_ranges=[("66111", "66133")]),
 }
 
 
