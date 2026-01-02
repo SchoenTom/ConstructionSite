@@ -560,14 +560,73 @@ def render_financial_model():
         }
         st.dataframe(pd.DataFrame(scenario_data), use_container_width=True, hide_index=True)
 
-        # Cash flow chart
+        # Cash flow chart with detailed explanation
         if result.base_case.cash_flows:
+            st.subheader("Jährliche Cashflow-Analyse")
+
+            # Explanation of what cash flow consists of
+            with st.expander("Was ist der Cashflow und wie wird er berechnet?", expanded=False):
+                st.markdown("""
+                #### Bestandteile des jährlichen Cashflows
+
+                Der **Cashflow nach Steuern** zeigt, wie viel Geld Sie tatsächlich jedes Jahr aus dem Investment erhalten (oder zuschießen müssen).
+
+                **Berechnung Schritt für Schritt:**
+
+                | Komponente | Beschreibung |
+                |------------|--------------|
+                | **+ Bruttomieteinnahmen** | Monatliche Kaltmiete × 12 Monate |
+                | **− Leerstandsverlust** | Geschätzter Mietausfall bei Mieterwechsel (ca. 3-5%) |
+                | **= Effektive Mieteinnahmen** | Was tatsächlich an Miete eingeht |
+                | **− Nicht-umlagefähige Nebenkosten** | Kosten, die nicht auf den Mieter umgelegt werden können |
+                | **− Hausverwaltung** | Kosten für die Verwaltung (ca. 20-25€/Einheit/Monat) |
+                | **− Instandhaltungsrücklage** | Rücklage für Reparaturen (ca. 1% des Gebäudewerts/Jahr) |
+                | **= Netto-Betriebsergebnis** | Einnahmen nach allen Betriebskosten |
+                | **− Zinszahlung** | Zinsen für das Darlehen |
+                | **− Tilgung** | Rückzahlung des Darlehens |
+                | **= Cashflow vor Steuern** | |
+                | **± Steuereffekt** | Einkommensteuer auf Mietüberschuss, ABER: AfA-Abschreibung (2-3% des Gebäudewerts) mindert die Steuerlast erheblich! |
+                | **= Cashflow nach Steuern** | **Das ist Ihr tatsächlicher jährlicher Überschuss (oder Zuschuss)** |
+
+                **Legende im Diagramm:**
+                - 🟢 **Grüne Balken** = Positiver Cashflow (Sie erhalten Geld)
+                - 🔴 **Rote Balken** = Negativer Cashflow (Sie müssen Geld zuschießen)
+
+                **Hinweis:** Ein negativer Cashflow in den ersten Jahren ist nicht ungewöhnlich, besonders bei hoher Tilgung.
+                Die Tilgung baut Eigenkapital auf und ist keine "verlorene" Ausgabe!
+                """)
+
             cf_data = [
                 {"year": cf.year, "after_tax_cash_flow": cf.after_tax_cash_flow}
                 for cf in result.base_case.cash_flows
             ]
             cf_chart = chart_factory.create_cashflow_waterfall(cf_data)
             st.plotly_chart(cf_chart, use_container_width=True)
+
+            # Additional context about the cash flow
+            total_cf = sum(cf.after_tax_cash_flow for cf in result.base_case.cash_flows)
+            avg_cf = total_cf / len(result.base_case.cash_flows) if result.base_case.cash_flows else 0
+            positive_years = sum(1 for cf in result.base_case.cash_flows if cf.after_tax_cash_flow > 0)
+
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric(
+                    "Gesamter Cashflow",
+                    f"€{total_cf:,.0f}",
+                    help="Summe aller jährlichen Cashflows über die Haltedauer"
+                )
+            with col2:
+                st.metric(
+                    "Durchschnittlicher Cashflow pro Jahr",
+                    f"€{avg_cf:,.0f}",
+                    help="Durchschnittlicher jährlicher Cashflow"
+                )
+            with col3:
+                st.metric(
+                    "Jahre mit positivem Cashflow",
+                    f"{positive_years} von {len(result.base_case.cash_flows)}",
+                    help="Anzahl der Jahre mit Überschuss"
+                )
 
         # Sensitivity analysis
         if result.sensitivity_analysis:

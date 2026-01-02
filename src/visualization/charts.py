@@ -397,30 +397,116 @@ class ChartFactory:
         cash_flows: List[Dict[str, Any]],
         title: str = "Jährliche Cashflow-Entwicklung nach Steuern"
     ) -> go.Figure:
-        """Create a bar chart showing cash flow by year."""
+        """
+        Create a bar chart showing cash flow by year with detailed legend.
+
+        Cash Flow Components Explained:
+        ===============================
+
+        The after-tax cash flow shown in this chart is calculated as follows:
+
+        (+) Bruttomieteinnahmen (Gross Rental Income)
+            → Monthly rent × 12 months × square meters
+
+        (-) Leerstandsverlust (Vacancy Loss)
+            → Estimated time without tenant (typically 3-5%)
+
+        (=) Effektive Mieteinnahmen (Effective Rental Income)
+
+        (-) Betriebskosten (Operating Expenses)
+            → Non-recoverable costs: management, insurance, repairs
+
+        (-) Grundsteuer (Property Tax)
+            → Annual property tax to municipality
+
+        (-) Instandhaltungsrücklage (Maintenance Reserve)
+            → Reserve for future repairs and renovations
+
+        (=) Netto-Betriebsergebnis (Net Operating Income / NOI)
+
+        (-) Zinszahlung (Interest Payment)
+            → Interest portion of mortgage payment
+
+        (-) Tilgung (Principal Payment)
+            → Principal portion of mortgage payment
+
+        (=) Cash Flow vor Steuern (Before-Tax Cash Flow)
+
+        (+) AfA-Steuerersparnis (Depreciation Tax Benefit)
+            → Tax savings from building depreciation (2-3% p.a.)
+
+        (-) Einkommensteuer (Income Tax on remaining taxable income)
+
+        (=) Cash Flow nach Steuern (After-Tax Cash Flow)
+            → This is what you actually keep!
+        """
         years = [f"Jahr {cf['year']}" for cf in cash_flows[:10]]
         values = [cf['after_tax_cash_flow'] for cf in cash_flows[:10]]
         colors = [COLORS["secondary"] if v >= 0 else COLORS["danger"] for v in values]
 
-        fig = go.Figure(go.Bar(
+        fig = go.Figure()
+
+        # Main cash flow bars
+        fig.add_trace(go.Bar(
             x=years,
             y=values,
             marker_color=colors,
             text=[f"€{v:,.0f}" for v in values],
             textposition='outside',
-            textfont=dict(color="#000000", size=11)
+            textfont=dict(color="#000000", size=11),
+            name='Cashflow nach Steuern',
+            hovertemplate=(
+                '<b>%{x}</b><br>' +
+                'Cashflow: €%{y:,.0f}<br>' +
+                '<extra></extra>'
+            )
         ))
 
         fig.add_hline(y=0, line_width=2, line_color="#000000")
+
+        # Add legend annotation explaining the components
+        fig.add_annotation(
+            x=1.02,
+            y=0.98,
+            xref="paper",
+            yref="paper",
+            text=(
+                "<b>Cashflow-Bestandteile:</b><br>"
+                "<span style='color:#28a745'>●</span> Positiv = Überschuss<br>"
+                "<span style='color:#dc3545'>●</span> Negativ = Zuschuss nötig<br><br>"
+                "<b>Berechnung:</b><br>"
+                "+ Mieteinnahmen<br>"
+                "- Leerstand<br>"
+                "- Betriebskosten<br>"
+                "- Zinsen & Tilgung<br>"
+                "± Steuereffekt (inkl. AfA)"
+            ),
+            showarrow=False,
+            font=dict(size=10, color="#000000"),
+            align="left",
+            bgcolor="rgba(248, 249, 250, 0.95)",
+            bordercolor="#cccccc",
+            borderwidth=1,
+            borderpad=8
+        )
 
         fig.update_layout(
             title=dict(text=title, font=dict(color="#000000", size=16)),
             xaxis_title="Jahr",
             yaxis_title="Cashflow in Euro",
-            height=420,
-            margin=dict(l=80, r=30, t=60, b=50),
+            height=480,
+            margin=dict(l=80, r=180, t=60, b=50),  # Extra right margin for legend
             paper_bgcolor="white",
-            plot_bgcolor="white"
+            plot_bgcolor="white",
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="left",
+                x=0,
+                font=dict(color="#000000")
+            )
         )
 
         fig = ChartFactory._apply_dark_text(fig)
