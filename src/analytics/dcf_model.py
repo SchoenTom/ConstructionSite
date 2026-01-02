@@ -25,6 +25,12 @@ from ..utils.helpers import (
     calculate_rental_yield, estimate_renovation_cost,
     calculate_energy_cost_factor, format_currency
 )
+from ..utils.plz_service import plz_service
+from ..utils.german_tax import (
+    get_grunderwerbsteuer_rate, get_depreciation_rate,
+    calculate_acquisition_costs, calculate_capital_gains_tax,
+    calculate_depreciation_schedule
+)
 from ..data_fetchers.market_data import market_data_fetcher
 
 
@@ -240,16 +246,41 @@ class DCFModel:
 
     def _enrich_inputs(self, inputs: PropertyInput) -> PropertyInput:
         """Enrich inputs with market data where not provided."""
+        # Get Bundesland from PLZ for correct tax rates
+        bundesland = None
+        if inputs.plz:
+            bundesland = plz_service.get_bundesland(inputs.plz)
+
+        # Calculate correct acquisition costs using Bundesland-specific Grunderwerbsteuer
+        if bundesland:
+            acq_costs = calculate_acquisition_costs(
+                inputs.purchase_price,
+                bundesland,
+                include_makler=True
+            )
+            # Update acquisition_costs as ratio of purchase price
+            inputs.acquisition_costs = acq_costs.acquisition_cost_percentage
+
+        # Get correct depreciation rate based on building year (JStG 2022)
+        afa_rate, _, _ = get_depreciation_rate(inputs.baujahr)
+        inputs.depreciation_rate = afa_rate
+
         # Get rent estimate from market data if not provided
         if inputs.initial_rent_sqm is None:
             if inputs.plz:
-                rental_data = market_data_fetcher.get_rental_estimate(
-                    inputs.plz,
-                    inputs.sqm,
-                    inputs.property_type,
-                    inputs.condition
-                )
-                inputs.initial_rent_sqm = rental_data.get("rent_per_sqm", 12.0)
+                # Try PLZ service first for more accurate data
+                market_data = plz_service.interpolate_market_data(inputs.plz)
+                if market_data:
+                    inputs.initial_rent_sqm = market_data["rent_sqm"]
+                else:
+                    # Fallback to market data fetcher
+                    rental_data = market_data_fetcher.get_rental_estimate(
+                        inputs.plz,
+                        inputs.sqm,
+                        inputs.property_type,
+                        inputs.condition
+                    )
+                    inputs.initial_rent_sqm = rental_data.get("rent_per_sqm", 12.0)
             else:
                 # Default rent estimate
                 inputs.initial_rent_sqm = 12.0
@@ -419,7 +450,7 @@ class DCFModel:
         inputs: PropertyInput,
         final_cf: CashFlowYear
     ) -> Dict[str, float]:
-        """Calculate exit/sale proceeds."""
+        """Calculate exit/sale proceeds with German tax law (Spekulationsfrist)."""
         # Exit price based on growth assumption
         exit_price = inputs.purchase_price * (
             (1 + inputs.exit_price_growth) ** inputs.holding_period_years
@@ -431,23 +462,41 @@ class DCFModel:
         # Remaining loan balance
         loan_payoff = final_cf.loan_balance
 
-        # Capital gains tax (if held less than 10 years)
-        capital_gain = exit_price - inputs.purchase_price
-        if inputs.holding_period_years < 10:
-            cgt = max(0, capital_gain * inputs.personal_tax_rate)
-        else:
-            cgt = 0  # Tax-free after 10 years in Germany
+        # Calculate accumulated depreciation
+        depreciable_value = inputs.purchase_price * (1 - inputs.land_value_ratio)
+        accumulated_depreciation = depreciable_value * inputs.depreciation_rate * inputs.holding_period_years
+
+        # Original cost basis (purchase price + acquisition costs)
+        original_cost_basis = inputs.purchase_price * (1 + inputs.acquisition_costs)
+
+        # Get Bundesland for tax calculation
+        bundesland = "Bayern"  # Default
+        if inputs.plz:
+            bundesland = plz_service.get_bundesland(inputs.plz) or "Bayern"
+
+        # Use proper German capital gains tax calculation with Spekulationsfrist
+        cgt_result = calculate_capital_gains_tax(
+            sale_price=exit_price,
+            original_cost_basis=original_cost_basis,
+            accumulated_depreciation=accumulated_depreciation,
+            holding_period_years=inputs.holding_period_years,
+            marginal_tax_rate=inputs.personal_tax_rate,
+            bundesland=bundesland,
+            is_church_member=False  # Conservative assumption
+        )
 
         # Net proceeds
         gross_proceeds = exit_price - selling_costs
-        net_proceeds = gross_proceeds - loan_payoff - cgt
+        net_proceeds = gross_proceeds - loan_payoff - cgt_result.estimated_tax
 
         return {
             "exit_price": exit_price,
             "selling_costs": selling_costs,
             "loan_payoff": loan_payoff,
-            "capital_gain": capital_gain,
-            "capital_gains_tax": cgt,
+            "capital_gain": cgt_result.capital_gain,
+            "capital_gains_tax": cgt_result.estimated_tax,
+            "is_tax_exempt": cgt_result.is_tax_exempt,
+            "accumulated_depreciation": accumulated_depreciation,
             "gross_proceeds": gross_proceeds,
             "net_proceeds": net_proceeds
         }

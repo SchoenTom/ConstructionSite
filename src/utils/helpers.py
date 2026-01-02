@@ -213,17 +213,33 @@ def calculate_npv(cash_flows: List[float], discount_rate: float) -> float:
     """
     Calculate Net Present Value (NPV).
 
+    Correct NPV formula: CF₀ + Σ(CFₜ / (1+r)^t) for t=1 to n
+    Period 0 is NOT discounted (it represents today's value).
+
     Args:
-        cash_flows: List of cash flows
-        discount_rate: Discount rate as decimal
+        cash_flows: List of cash flows (cash_flows[0] is period 0, typically negative)
+        discount_rate: Discount rate as decimal (0.08 = 8%)
 
     Returns:
         NPV in same currency as cash flows
+
+    Example:
+        >>> calculate_npv([-100000, 20000, 25000, 30000, 120000], 0.08)
+        # Period 0: -100000 (not discounted)
+        # Period 1: 20000 / 1.08 = 18518.52
+        # Period 2: 25000 / 1.08² = 21433.47
+        # etc.
     """
-    try:
-        return float(npf.npv(discount_rate, cash_flows))
-    except Exception:
+    if not cash_flows:
         return 0.0
+
+    # Period 0 is NOT discounted (it's today's value)
+    npv = float(cash_flows[0])
+
+    for t, cf in enumerate(cash_flows[1:], start=1):
+        npv += cf / ((1 + discount_rate) ** t)
+
+    return round(npv, 2)
 
 
 def calculate_equity_multiple(total_returns: float, total_invested: float) -> float:

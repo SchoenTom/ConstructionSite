@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
 import logging
-import random
 
 from ..utils.config import config, GERMAN_CITIES, PLZ_CITY_MAPPING, CityData
 
@@ -90,8 +89,8 @@ class MarketDataFetcher:
         """
         Initialize base market data for all cities from config.
 
-        Dynamically generates market data based on city characteristics
-        from the GERMAN_CITIES configuration.
+        Uses deterministic calculations based on city characteristics
+        from the GERMAN_CITIES configuration. No random data.
         """
         base_data = {}
 
@@ -106,48 +105,51 @@ class MarketDataFetcher:
             price_range_high = avg_price * 1.65
 
             # Price change correlates with price level (more expensive = bigger correction)
+            # Deterministic: midpoint of range, slightly adjusted by price tier
             if avg_price > 7000:
-                price_yoy_change = random.uniform(-8.0, -5.0)
+                price_yoy_change = -6.5  # Midpoint of -8 to -5
             elif avg_price > 5000:
-                price_yoy_change = random.uniform(-6.0, -3.5)
+                price_yoy_change = -4.8  # Midpoint of -6 to -3.5
             elif avg_price > 3500:
-                price_yoy_change = random.uniform(-4.5, -2.0)
+                price_yoy_change = -3.3  # Midpoint of -4.5 to -2
             else:
-                price_yoy_change = random.uniform(-3.0, -0.5)
+                price_yoy_change = -1.8  # Midpoint of -3 to -0.5
 
             # Rent growth (typically positive, higher in tight markets)
+            # Deterministic: midpoint of range
             if avg_rent > 14:
-                rent_yoy_change = random.uniform(4.0, 6.0)
+                rent_yoy_change = 5.0  # Midpoint of 4 to 6
             elif avg_rent > 11:
-                rent_yoy_change = random.uniform(3.5, 5.0)
+                rent_yoy_change = 4.3  # Midpoint of 3.5 to 5
             else:
-                rent_yoy_change = random.uniform(3.0, 4.5)
+                rent_yoy_change = 3.8  # Midpoint of 3 to 4.5
 
             # Inventory months (larger cities = tighter markets)
+            # Deterministic: midpoint of range
             if population > 1000000:
-                inventory_months = random.uniform(4.0, 5.5)
+                inventory_months = 4.8  # Midpoint of 4 to 5.5
             elif population > 500000:
-                inventory_months = random.uniform(4.5, 6.0)
+                inventory_months = 5.3  # Midpoint of 4.5 to 6
             elif population > 200000:
-                inventory_months = random.uniform(5.0, 7.0)
+                inventory_months = 6.0  # Midpoint of 5 to 7
             else:
-                inventory_months = random.uniform(5.5, 8.0)
+                inventory_months = 6.8  # Midpoint of 5.5 to 8
 
-            # Days on market (inverse of market activity)
-            days_on_market = inventory_months * 10 + random.uniform(-5, 10)
+            # Days on market: deterministic calculation
+            days_on_market = int(inventory_months * 10 + 2.5)  # Midpoint adjustment
 
-            # Unemployment rate by region (approximation)
+            # Unemployment rate by region (deterministic midpoints)
             state = city_info.state
             if state in ["Bayern", "Baden-Württemberg"]:
-                unemployment_rate = random.uniform(3.0, 5.0)
+                unemployment_rate = 4.0  # Midpoint of 3 to 5
             elif state in ["Hamburg", "Hessen"]:
-                unemployment_rate = random.uniform(4.5, 7.0)
+                unemployment_rate = 5.8  # Midpoint of 4.5 to 7
             elif state in ["Berlin", "Bremen"]:
-                unemployment_rate = random.uniform(7.5, 10.0)
+                unemployment_rate = 8.8  # Midpoint of 7.5 to 10
             elif state in ["Sachsen", "Thüringen", "Sachsen-Anhalt", "Brandenburg", "Mecklenburg-Vorpommern"]:
-                unemployment_rate = random.uniform(5.5, 8.0)
+                unemployment_rate = 6.8  # Midpoint of 5.5 to 8
             else:
-                unemployment_rate = random.uniform(5.0, 8.0)
+                unemployment_rate = 6.5  # Midpoint of 5 to 8
 
             # Median income correlates with price level
             median_income = max(32000, min(65000, avg_price * 6.5))
@@ -159,7 +161,7 @@ class MarketDataFetcher:
                 "price_yoy_change": round(price_yoy_change, 1),
                 "rent_yoy_change": round(rent_yoy_change, 1),
                 "inventory_months": round(inventory_months, 1),
-                "days_on_market": int(days_on_market),
+                "days_on_market": days_on_market,
                 "unemployment_rate": round(unemployment_rate, 1),
                 "median_income": int(median_income),
             }
